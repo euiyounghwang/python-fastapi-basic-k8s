@@ -1,9 +1,16 @@
-version: '3.8'
+version: "3.8"
 name: spark-cluster-docker
 services:
   spark-master:
     image: spark:3.5.1
     container_name: spark_master
+    command:
+      [
+        "/opt/spark/bin/spark-class",
+        "org.apache.spark.deploy.master.Master",
+        "-h",
+        "spark-master",
+      ]
     environment:
       - SPARK_MODE=master
       - SPARK_RPC_AUTHENTICATION_ENABLED=false
@@ -18,6 +25,12 @@ services:
   spark-worker:
     image: spark:3.5.1
     container_name: spark_worker_1
+    command:
+      [
+        "/opt/spark/bin/spark-class",
+        "org.apache.spark.deploy.worker.Worker",
+        "spark://spark-master:7077",
+      ]
     environment:
       - SPARK_MODE=worker
       - SPARK_MASTER_URL=spark://spark-master:7077
@@ -30,17 +43,21 @@ services:
       - bridge
 
   jupyter:
-      image: jupyter/pyspark-notebook:latest # PySpark 지원 이미지
-      ports:
-        - "8888:8888"
-      environment:
-        - SPARK_MASTER=spark://spark-master:7077 # 마스터 주소 설정
-        - JUPYTER_TOKEN=your_token # 보안 토큰 (선택적)
-      depends_on:
-        - spark-master
-      networks:
-        - bridge
-      
+    image: jupyter/pyspark-notebook:latest # PySpark 지원 이미지
+    ports:
+      - "8088:8888"
+    environment:
+      - SPARK_MASTER=spark://spark-master:7077 # 마스터 주소 설정
+      - JUPYTER_ENABLE_LAB=yes # Enable JupyterLab interface
+      - JUPYTER_TOKEN=1234 # 보안 토큰 (선택적)
+    depends_on:
+      - spark-master
+    volumes:
+      # Mount your local work directory into the container
+      - "./Jupyter:/home/jovyan/work:rw"
+    networks:
+      - bridge
+
 networks:
   bridge:
     driver: bridge
