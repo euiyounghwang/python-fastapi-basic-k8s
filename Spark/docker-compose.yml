@@ -2,7 +2,7 @@ version: '3.8'
 name: spark-cluster-docker
 services:
   spark-master:
-    image: bitnami/spark:latest
+    image: spark:3.5.1
     container_name: spark_master
     environment:
       - SPARK_MODE=master
@@ -13,10 +13,10 @@ services:
       - "8080:8080" # Spark Master UI
       - "7077:7077" # Spark Master Port
     networks:
-      - spark-network
+      - bridge
 
   spark-worker:
-    image: bitnami/spark:latest
+    image: spark:3.5.1
     container_name: spark_worker_1
     environment:
       - SPARK_MODE=worker
@@ -27,8 +27,20 @@ services:
     depends_on:
       - spark-master
     networks:
-      - spark-network
+      - bridge
 
+  jupyter:
+      image: jupyter/pyspark-notebook:latest # PySpark 지원 이미지
+      ports:
+        - "8888:8888"
+      environment:
+        - SPARK_MASTER=spark://spark-master:7077 # 마스터 주소 설정
+        - JUPYTER_TOKEN=your_token # 보안 토큰 (선택적)
+      depends_on:
+        - spark-master
+      networks:
+        - bridge
+      
 networks:
-  spark-network:
+  bridge:
     driver: bridge
