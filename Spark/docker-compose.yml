@@ -1,6 +1,10 @@
 version: "3.8"
 name: spark-cluster-docker
 services:
+  # docker run --rm -it --name spark bitnami/spark:latest spark-shell
+  # docker run -d --name master --network spark-connect -p 8888:8080 -p 7077:7077 apache/spark /opt/spark/bin/spark-class org.apache.spark.deploy.master.Master
+  # docker exec -it --user root spark-master bash
+  # pip3 install pyspark
   spark-master:
     image: spark:3.5.1
     container_name: spark_master
@@ -22,6 +26,8 @@ services:
     networks:
       - bridge
 
+  # docker compose up --scale worker=4
+  # docker run -d --name worker1 --network spark-connect -e SPARK_WORKER_MEMORY=1g -e SPARK_WORKER_CORE=2 apache/spark /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077 
   spark-worker:
     image: spark:3.5.1
     container_name: spark_worker_1
@@ -42,6 +48,12 @@ services:
     networks:
       - bridge
 
+  # docker run --rm -p 8888:8888 -p 4040:4040 -v ./jupyter:/home/jupyter jupyter/pyspark-notebook:latest
+  # from pyspark.sql import SparkSession
+  # spark = SparkSession.builder \
+  #  .master("spark://spark-master:7077") \
+  #  .appName("Jupytertest") \
+  #  .getOrCreate()
   jupyter:
     image: jupyter/pyspark-notebook:latest # PySpark 지원 이미지
     ports:

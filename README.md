@@ -410,6 +410,39 @@ TOTAL                     65      1    98%
   - /home/devuser/ES/k8s
 
 
+### Uptime Kumna
+- Uptime Kuma is an easy-to-use self-hosted monitoring tool (https://github.com/louislam/uptime-kuma). Uptime Kuma is an open-source, free and easy-to-use self-hosted monitoring tool. Uptime Kuma is compatible with multiple platforms including Linux, Windows 10 (x64) and Windows Server.
+- __Installation Commands__
+  - docker run -d --restart=always -p 3001:3001 -v uptime-kuma:/app/data --name uptime-kuma louislam/uptime-kuma:2
+  - nodejs install
+    - nodejs download(https://nodejs.org/dist/latest/)
+    - devuser@localhost node-v14.21.3-linux-x64]$ sudo mv ./* /usr/local/lib/nodejs
+    - sudo mv node-v20.11.1-linux-x64 /usr/local/lib/nodejs
+    - vi ~/.bashrc # Bash 쉘 사용자 source ~/.bashrc # 또는 source ~/.zshrc
+    - or export PATH=$PATH:/usr/local/lib/nodejs/bin
+    - node -v, npm -v
+
+- Prometheus Integration : To configure Prometheus to scrape an endpoint that requires basic authentication, you add the basic_auth section directly within the scrape_config section of your main prometheus.yml file.
+  - curl -u alinos:test http://localhost:3001/metrics # HELP 
+  ```bash
+  scrape_configs:
+    - job_name: 'authenticated-target'
+      # ... other configurations like metrics_path, scheme ...
+      static_configs:
+        - targets: ['your-target-ip:port']
+
+      basic_auth:
+        username: <target_username>
+        password: <target_password> # Passwords are in plaintext here
+        # or you can use password_file to reference a file containing the password
+        # password_file: /path/to/password_file
+  ```
+
+
+### Apache NiFI
+- Apache NiFi(https://nifi.apache.org/download/) is a dataflow system based on the concepts of flow-based programming. It supports powerful and scalable directed graphs of data routing, transformation, and system mediation logic. NiFi has a web-based user interface for design, control, feedback, and monitoring of dataflows. 
+
+
 ### Search Engine
 - Meilisearch(https://github.com/meilisearch/meilisearch) : Meilisearch is an open-source, lightning-fast search engine designed to provide a highly relevant and intuitive search experience for applications and websites
 ```bash

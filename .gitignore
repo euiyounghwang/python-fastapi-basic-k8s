@@ -2,3 +2,4 @@
 logs/
 .env
 Spark/Jupyter/.ipynb_checkpoints
+data/
