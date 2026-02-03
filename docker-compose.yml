@@ -15,6 +15,38 @@ services:
       - ~/jenkins:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
       - /usr/local/bin/docker:/usr/local/bin/docker
+    networks:
+      - bridge
+
+  # docker run -d --name nifi_container -e NiFi_WEB_HTTPS_PORT='8080' -e SINGLE_USER_CREDENTIALS_USERNAME='admin' -e SINGLE_USER_CREDENTIALS_PASSWORD='1234' -p 8080:8080 -p 52020:52020 -p 8443:8443 -p 10000:10000 apache/nifi:latest
+  nifi:
+    image: apache/nifi:latest
+    ports:
+      - "8080:8080"
+    environment:
+      - NIFI_WEB_HTTP_PORT=8080
+      # Optional: set a default username and password for single-user authentication
+      # - SINGLE_USER_CREDENTIALS_USERNAME=admin
+      # - SINGLE_USER_CREDENTIALS_PASSWORD=your_password
+    volumes:
+      # Optional: mount a local directory for persistence
+      # - ./nifi_data:/opt/nifi/nifi-current/database_repository
+    container_name: nifi_container
+    restart: on-failure
+    networks:
+      - bridge
+
+  # docker run -d --restart=always -p 3001:3001 -v uptime-kuma:/app/data --name uptime-kuma louislam/uptime-kuma:1
+  uptime-kuma:
+    image: louislam/uptime-kuma:2
+    restart: unless-stopped
+    volumes:
+      - ./data:/app/data
+    ports:
+      # <Host Port>:<Container Port>
+      - "3001:3001"
+    networks:
+      - bridge
 
   meilisearch:
     container_name: meilisearch
@@ -31,7 +63,9 @@ services:
       - ${MEILI_PORT:-7700}:7700
     volumes:
       - ./data.ms:/data.ms
-    restart: unless-stopped    
+    restart: unless-stopped
+    networks:
+      - bridge    
 
   # After the containers are up, ZincSearch can be accessed in a web browser at http://localhost:4080
   zincsearch:
@@ -45,6 +79,8 @@ services:
       ZINC_DATA_PATH: /app/data
     volumes:
       - ./:/app/data # Persistent storage for ZincSearch data
+    networks:
+      - bridge
   
   fn-es8:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.8.0
