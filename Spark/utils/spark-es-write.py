@@ -27,6 +27,7 @@ def work():
         "es.batch.size.bytes": "4mb",     # Adjust bulk size for performance
         "es.batch.size.entries": "1000",
         "es.nodes.wan.only": "true"       # Use if connecting to a cloud ES instance
+        # "es.index.auto.create": "true"  # Automatically create the index if it doesn't exist
     }
 
     # Write the DataFrame to Elasticsearch
